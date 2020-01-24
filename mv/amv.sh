@@ -12,13 +12,13 @@ fail() {
 
 # Print usage and quit
 usage() {
-	printf "Usage: afuck.sh <send|get|auto> <target>\n"
+	printf "Usage: amv.sh <send|get|auto> <target>\n"
 	exit 0 
 }
 
 # Check for a command
 check() {
-	command -v "$1" &> /dev/null || fail "afuck.sh requires $1. Please install it or add it to your path."
+	command -v "$1" &> /dev/null || fail "amv.sh requires $1. Please install it or add it to your path."
 }
 
 ###
@@ -56,7 +56,7 @@ auto() {
 	while :; do
 		if [ $(adb devices | wc -l) -gt 2 ]; then
 			printf "Found a new device! Attempting to get $FILE\n"
-			fuck.sh get $FILE || fail "Get failed, aborting."
+			amv.sh get $FILE || fail "Get failed, aborting."
 
 			printf "Adding to git\n"
 			git add . || fail "Failed to add to git"

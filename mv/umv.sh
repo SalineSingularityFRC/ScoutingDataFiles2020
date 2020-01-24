@@ -27,13 +27,13 @@ cleanup() {
 
 # Print usage and quit
 usage() {
-	printf "Usage:\n\t# ufuck.sh <send|get|auto> <device> <target>\n"
+	printf "Usage:\n\t# umv.sh <send|get|auto> <device> <target>\n"
 	exit 0 
 }
 
 # Check for a command
 check() {
-	command -v "$1" &> /dev/null || fail "ufuck.sh requires $1. Please install it or add it to your path."
+	command -v "$1" &> /dev/null || fail "umv.sh requires $1. Please install it or add it to your path."
 }
 
 ###
@@ -71,7 +71,7 @@ auto() {
 		if ls $DEV &> /dev/null; then
 			printf "Found a new device! Attempting to get $FILE\n"
 
-			ufuck.sh get $DEV $FILE || fail "Failed to get $FILE" 
+			umv.sh get $DEV $FILE || fail "Failed to get $FILE" 
 			git add . || fail "Failed to add to git"
 			git commit -m "NEW AUTOMATIC DOWNLOAD $(date)"
 		fi
@@ -87,10 +87,10 @@ if [ -z $1 ] || [ -z $2 ] || [ -z $3 ]; then usage; fi
 ###
 
 # Get Run Commands
-if [ ! -d ~/.config/fuckrc ]; then
-	source ~/.config/fuckrc
+if [ ! -d ~/.config/mvrc ]; then
+	source ~/.config/mvrc
 else
-	UFUCK_TARGET_DIR=/mnt
+	UMV_TARGET_DIR=/mnt
 fi
 
 # Check for dependancies
@@ -102,7 +102,7 @@ if [ "$EUID" -ne 0 ]; then fail "Please run as root"; fi
 COMMAND="$1"
 DEV="$2"
 FILE="$3"
-MNT="$UFUCK_TARGET_DIR"
+MNT="$UMV_TARGET_DIR"
 
 # Catch exit
 trap cleanup EXIT
