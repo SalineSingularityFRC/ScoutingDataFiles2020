@@ -5,6 +5,8 @@ if [ "$EUID" -ne 0 ]; then
 	exit 1
 fi
 
+
+echo -n "Overwriting /lib/systemd/system/bluetooth.service..."
 cat > /lib/systemd/system/bluetooth.service << EOF
 [Unit]
 Description=Bluetooth service
@@ -27,10 +29,15 @@ ProtectSystem=full
 WantedBy=bluetooth.target
 Alias=dbus-org.bluez.service
 EOF
+echo "OK"
 
-if ! sdptool browse local; then 
+echo -n "Testing with sdptool..."
+if ! sdptool browse local &> /dev/null; then 
 	echo "sdptool FAILURE! Ain't good"
 	exit 1
 fi
+echo "OK"
 
+echo -n "Configuring hci0..."
 hciconfig hci0 piscan
+echo "OK"
