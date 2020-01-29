@@ -10,6 +10,8 @@ port=server_sock.getsockname()[1]
 uuid="4f63aea8-be86-4f54-b8c8-2f0c9d37b56b"
 name="Super Singularity Scouting Server"
 
+DATA_ROOT="/var/www/html"
+
 advertise_service(server_sock, name,
 	service_id = uuid,
 	service_classes = [ uuid, SERIAL_PORT_CLASS ],
@@ -27,8 +29,8 @@ def doClient():
 		data = client_sock.recv(1024)
 		print("Data recieved.")
 		print(data)
-		str=open("/var/www/html/matchData.json","r").read()
-		matchDataFile=open("/var/www/html/matchData.json","w")
+		str=open("{}/matchData.json".format(DATA_ROOT), "r").read()
+		matchDataFile=open("{}/matchData.json".format(DATA_ROOT), "w")
 		dataJSON = json.loads(data.rstrip())
 		matchDataString=json.dumps(dataJSON["matchData"])[1:-1]
 		targetLength=len(matchDataString)
@@ -39,12 +41,12 @@ def doClient():
 		else:
 			matchDataFile.write(str)
 		matchDataFile.close()
-		teamDataFile = open("/var/www/html/teamData.json","a")
+		teamDataFile = open("{}/teamData.json".format(DATA_ROOT), "a")
 		teamDataString=","+json.dumps(dataJSON["teamData"])[1:-1]
 		if len(teamDataString)>1:
 			teamDataFile.write(teamDataString)
 		teamDataFile.close()
-		teamDataFile = open("/var/www/html/teamData.json","r")
+		teamDataFile = open("{}/teamData.json".format(DATA_ROOT), "r")
 		
 		client_sock.send(""+teamDataFile.read()+"]\n")
 		teamDataFile.close()
