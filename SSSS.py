@@ -1,5 +1,8 @@
+#!/usr/bin/env python3
+
 from bluetooth import *
 import json
+import multiprocessing
 
 server_sock=BluetoothSocket(RFCOMM)
 server_sock.bind(("",PORT_ANY))
@@ -10,7 +13,7 @@ port=server_sock.getsockname()[1]
 uuid="4f63aea8-be86-4f54-b8c8-2f0c9d37b56b"
 name="Super Singularity Scouting Server"
 
-DATA_ROOT="/var/www/html"
+DATA_ROOT="/home/pi/ScoutingSpreadsheet2019"
 
 advertise_service(server_sock, name,
 	service_id = uuid,
@@ -24,15 +27,24 @@ def doClient():
 	client_sock, client_info = server_sock.accept()
 	print("Accepted connection from "+client_info[0])
 
-
 	try:
-		data = client_sock.recv(1024)
+		buf = []
+		while True:
+			# Check for EOF (hacky!)
+			bytes = client_sock.recv(1024)
+			if bytes == b'EOF':
+				break
+			else:
+				buf.append(bytes)
+
+		data = b"".join(buf)
+
 		print("Data recieved.")
 		print(data)
-		str=open("{}/matchData.json".format(DATA_ROOT), "r").read()
-		matchDataFile=open("{}/matchData.json".format(DATA_ROOT), "w")
+		str = open("{}/matchData.json".format(DATA_ROOT), "r").read()
+		matchDataFile = open("{}/matchData.json".format(DATA_ROOT), "w")
 		dataJSON = json.loads(data.rstrip())
-		matchDataString=json.dumps(dataJSON["matchData"])[1:-1]
+		matchDataString = json.dumps(dataJSON['matchData'])[1:-1]
 		targetLength=len(matchDataString)
 		if len(matchDataString)>5:
 			str=str[:-1]
@@ -47,7 +59,7 @@ def doClient():
 			teamDataFile.write(teamDataString)
 		teamDataFile.close()
 		teamDataFile = open("{}/teamData.json".format(DATA_ROOT), "r")
-		
+
 		client_sock.send(""+teamDataFile.read()+"]\n")
 		teamDataFile.close()
 		print("Data sent.")
