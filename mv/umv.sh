@@ -40,7 +40,7 @@ check() {
 ### Commands
 ###
 
-# Send a file to /sdcard/db/$FILE
+# Send a file to drive
 send() {
         printf "Sending $FILE...\n"
 	mount $DEV $MNT || fail "Failed to mount $DEV"
@@ -51,7 +51,7 @@ send() {
         printf "Successfully sent $FILE!\n"
 }
 
-# Get a file from /sdcard/db/$FILE
+# Get a file
 get() {
 	printf "Getting $FILE...\n"
 	mount $DEV $MNT || fail "Failed to mount $DEV"
@@ -71,7 +71,7 @@ auto() {
 		if ls $DEV &> /dev/null; then
 			printf "Found a new device! Attempting to get $FILE\n"
 
-			umv.sh get $DEV $FILE || fail "Failed to get $FILE" 
+			umv.sh send $DEV $FILE || fail "Failed to get $FILE" 
 			git add . || fail "Failed to add to git"
 			git commit -m "NEW AUTOMATIC DOWNLOAD $(date)"
 		fi
@@ -86,13 +86,6 @@ if [ -z $1 ] || [ -z $2 ] || [ -z $3 ]; then usage; fi
 ### Setup
 ###
 
-# Get Run Commands
-if [ ! -d ~/.config/mvrc ]; then
-	source ~/.config/mvrc
-else
-	UMV_TARGET_DIR=/mnt
-fi
-
 # Check for dependancies
 check git
 
@@ -102,7 +95,7 @@ if [ "$EUID" -ne 0 ]; then fail "Please run as root"; fi
 COMMAND="$1"
 DEV="$2"
 FILE="$3"
-MNT="$UMV_TARGET_DIR"
+MNT="/mnt"
 
 # Catch exit
 trap cleanup EXIT
