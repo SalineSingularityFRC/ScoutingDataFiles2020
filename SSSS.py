@@ -9,6 +9,10 @@ ROOT = "/var/SSSS"
 uuid = "4f63aea8-be86-4f54-b8c8-2f0c9d37b56b"
 name = "Super Singularity Scouting Server"
 
+# Get LED pins for GPIO stuff
+led = LED(17)
+err_led = LED(27)
+
 def main():
     # Setup a socket for RFCOMM (serial over bluetooth)
     server_sock = BluetoothSocket(RFCOMM)
@@ -24,9 +28,6 @@ def main():
         service_classes = [ uuid, SERIAL_PORT_CLASS ],
         profiles = [ SERIAL_PORT_PROFILE ]
     )
-
-    # Get the pin for GPIO stuff
-    led = LED(17)
 
     # Run the client
     # Keep JSON in memory!
@@ -80,7 +81,7 @@ def main():
                     match_data.write(json.dumps(current_data))
                     match_data.close()
                 except:
-                    print("FAILED!")
+                    clean_exit()
                     continue
                 print("OK")
             
@@ -106,7 +107,7 @@ def main():
                     team_data_file.write(json.dumps(current_data))
                     team_data_file.close()
                 except:
-                    print("FAILED!")
+                    clean_exit()
                     continue
                 print("OK")
 
@@ -135,6 +136,13 @@ def send_team_data(client_sock):
     team_data = open("{}/teamData.json".format(ROOT), "r")
     client_sock.send(team_data.read())
     team_data.close()
+
+def clean_exit():
+    err_led.on()
+    print("FAILED")
+    print("Disconnecting...", end="")
+    client_sock.close()
+    print("OK")
 
 if __name__ == "__main__":
     main()
