@@ -74,3 +74,6 @@ echo "Starting bluetooth services"
 systemctl start systemd-networkd
 systemctl start bt-agent
 systemctl start bt-network
+
+echo "Changing hostname"
+echo "ssss-pi" > /etc/hostname
